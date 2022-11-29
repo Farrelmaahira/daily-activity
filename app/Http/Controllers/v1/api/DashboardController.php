@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DashboardResource;
 use App\Models\DailyActivity;
 use App\Models\Position;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,11 +18,13 @@ class DashboardController extends BaseController
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        $result['user'] = $request->user();
-        $result['position_label'] = Position::pluck('name');
-        $result['user_position'] = Position::withCount("user")->pluck('user_count');
-        return response()->json($result);
+    {   
+        $user = $request->user();
+        // $result['position_label'] = Position::pluck('name');
+        // $result['user_position'] = Position::withCount("user")->pluck('user_count');
+        // $result['activity_data'] = DailyActivity::select(DB::raw('COUNT(*) as count'))->groupBy(DB::raw('YEAR(date)'))->pluck('count');
+        // $result['activity_label'] = DailyActivity::select(DB::raw('YEAR(date) as label'))->distinct()->pluck('label');
+        return response()->json($user);
        
     }
 

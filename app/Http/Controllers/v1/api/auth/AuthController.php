@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1\api\auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\v1\api\BaseController;
+use App\Http\Resources\UserResource;
 use App\Models\Position;
 use App\Models\User;
 use App\Rules\LowerCase;
@@ -23,12 +24,12 @@ class AuthController extends BaseController
 
     public function register(Request $request)
     {
-       
+    
         $validate = Validator::make($request->all(), [
             'name' => ['required'],
             'email' => ['required','email','unique:users', new LowerCase],
             'password' => ['required','min:8'],
-            'position_id' => ['required']
+            'position' => ['required']
         ]);
 
         if ($validate->fails()) {
@@ -38,7 +39,7 @@ class AuthController extends BaseController
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'position_id' => $request->position_id,
+            'position_id' => $request->position,
             'password' => Hash::make($request->password),
         ]);
         $user->assignRole('user');
@@ -62,9 +63,10 @@ class AuthController extends BaseController
         // }
 
         $user = User::where('email', $request->email)->first();
+        $response = UserResource::make($user);
         if(Auth::attempt($validate))
         {  
-            $data['data'] = $user;
+            $data['data'] = $response;
             $data['token'] = $user->createToken('APITOKEN')->plainTextToken;
             if($user->hasRole('leader')){
                 return $this->sendResponse($data, 'Login successfuly, Welcome leader');

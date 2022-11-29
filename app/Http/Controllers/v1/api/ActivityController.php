@@ -72,8 +72,7 @@ class ActivityController extends BaseController
      */
     public function store(Request $request)
     {
-        $user = User::where('position_id', $request->position)->pluck('id');
-        return response()->json($user);
+        
     }
 
     /**

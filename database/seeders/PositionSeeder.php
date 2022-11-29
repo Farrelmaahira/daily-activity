@@ -31,6 +31,9 @@ class PositionSeeder extends Seeder
      Position::create([
             'name' => 'Document Engineer'
         ]);
+     Position::create([
+            'name' => 'Quality Assurance'
+        ]);
 
     }
 }

@@ -21,15 +21,29 @@ class UserController extends BaseController
      */
     public function index(Request $request)
     {
-        $user = $request->user();
-        if($user->hasRole('leader'))
+        $auth = $request->user();
+        $this->validate($request, [
+            'position' => 'integer'
+        ]);
+        $user = User::query();
+        if($auth->hasRole('leader'))
         {
-           $user = UserResource::collection(User::role(['co-leader', 'user'])->with(['roles', 'position ' ])->get());
-           return $this->sendResponse($user, 'Here ur data');
-        }
+            if($request->has('position'))
+            {
+                $user->where('position_id', $request->position);
+            }
+            $data = UserResource::collection($user->role(['co-leader', 'user'])->with(['roles', 'position'])->get());
+            return $this->sendResponse($data, 'here ur data');
+        } else {
 
-        $user = UserResource::collection(User::role('user')->with('roles')->get());
-           return $this->sendResponse($user, 'Here ur data');
+            if($request->has('position'))
+            {
+                $user->where('position_id', $request->position);
+            }
+            $data = UserResource::collection($user->role('user')->with(['roles', 'position'])->get());
+            return $this->sendResponse($data, 'here ur data');
+        }
+       
     }  
 
     /**
@@ -153,3 +167,15 @@ class UserController extends BaseController
     }
    
 }
+
+
+
+        // $user = $request->user();
+        // if($user->hasRole('leader'))
+        // {
+        //    $user = UserResource::collection(User::role(['co-leader', 'user'])->with(['roles', 'position ' ])->get());
+        //    return $this->sendResponse($user, 'Here ur data');
+        // }
+
+        // $user = UserResource::collection(User::role('user')->with('roles')->get());
+        //    return $this->sendResponse($user, 'Here ur data');

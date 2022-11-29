@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Rules\LowerCase;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class ProfileController extends BaseController
     {
         
        $user = $request->user();
-       return $user;
+       $data = UserResource::make($user);
+       return response()->json($data);
         
     }
 

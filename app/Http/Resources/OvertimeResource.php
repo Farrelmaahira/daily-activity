@@ -19,9 +19,7 @@ class OvertimeResource extends JsonResource
             'date' => $this->date,
             'from' => $this->from,
             'untill' => $this->untill,
-            'user' => [
-                $this->user
-            ]
+            'user' => $this->user
         ];
     }
 }

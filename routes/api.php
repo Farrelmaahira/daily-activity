@@ -3,13 +3,12 @@
 use App\Http\Controllers\v1\api\ActivityController;
 use App\Http\Controllers\v1\api\auth\AuthController;
 use App\Http\Controllers\v1\api\DashboardController as ApiDashboardController;
-use App\Http\Controllers\v1\api\LeaderActivityController;
 use App\Http\Controllers\v1\api\MyActivityController;
+use App\Http\Controllers\v1\api\MyOvertimeController;
 use App\Http\Controllers\v1\api\OvertimeController;
 use App\Http\Controllers\v1\api\PositionController;
 use App\Http\Controllers\v1\api\ProfileController;
 use App\Http\Controllers\v1\api\UserController;
-use App\Models\Overtime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,14 +34,14 @@ Route::controller(AuthController::class)->group(function (){
   
 })->middleware('guest');
 
-Route::resource('/v1/dashboard/activity', ActivityController::class);
 Route::middleware(['auth:sanctum', 'role:leader|co-leader|user'])->group(function (){
+    Route::resource('/v1/dashboard/activity', ActivityController::class); 
     Route::get('/v1/dashboard', [ApiDashboardController::class, 'index']);
     Route::resource('/v1/dashboard/myactivity', MyActivityController::class);
     Route::post('/v1/auth/logout', [AuthController::class, 'logout']);
-    Route::resource('/v1/dashboard/myovertime', OvertimeController::class);
     Route::get('/v1/dashboard/overtime', [OvertimeController::class, 'general']);
     Route::resource('/v1/dashboard/profile', ProfileController::class);
+    Route::resource('/v1/dashboard/myovertime', MyOvertimeController::class);
 });
 
 Route::middleware(['auth:sanctum', 'role:leader|co-leader'])->group(function () {

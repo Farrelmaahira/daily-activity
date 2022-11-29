@@ -29,9 +29,10 @@ class MyActivityController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $user = $request->user();
+        return response()->json($user);
     }
 
     /**
@@ -58,7 +59,7 @@ class MyActivityController extends BaseController
         $count = count($data);
         if($count > 0)
         {
-            return $this->errorResponse('You have been input your activity on this date');
+            return $this->errorResponse($request, 'You have been input your activity on this date', 400);
         }
         // STORE DATA
         $data = DailyActivity::create([
