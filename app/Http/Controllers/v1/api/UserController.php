@@ -8,8 +8,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\v1\api\BaseController;
 use App\Http\Resources\ActivityResource;
 use App\Http\Resources\UserResource;
+use App\Rules\LowerCase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
 class UserController extends BaseController
@@ -53,8 +55,9 @@ class UserController extends BaseController
      */
     public function create()
     {
-        $role = Role::select()->get();
-        return $this->sendResponse($role, '');
+       $data['role'] = Role::select()->get();
+       $data['position'] = Role::select()->get();
+        return $this->sendResponse($data, '');
     }
  
     /**
@@ -66,23 +69,25 @@ class UserController extends BaseController
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required|min:8',
-            'role' => 'required'
+            'name' => ['required'],
+            'email' => ['required','email','unique:users', new LowerCase],
+            'password' => ['required', 'min:8'],
+            'role' => ['required'],
+            'position' => ['required']
         ]);
         if($validate->fails())
         {
-            return $this->errorResponse('Validation error', $validate->errors());
+            return $this->errorResponse($validate->errors());
         }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'position_id' => $request->position 
         ]);
         $user->assignRole($request->role);
-        return $this->sendResponse($user, 'New User has been updated');
+        return $this->sendResponse($user, 'New User has been added');
     }
 
     /**
@@ -91,6 +96,11 @@ class UserController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function show($id)
+    {
+        $user = UserResource::collection(User::where('id', $id)->get());
+        return $this->sendResponse($user, 'ldkjlj');
+    }
    
 
     /**
@@ -102,9 +112,7 @@ class UserController extends BaseController
     public function edit($id)
     {
         $role = Role::select()->get();
-        $user = User::find($id);
-        $user->roles;
-        $user->get();
+        $user = UserResource::collection(User::where('id', $id)->get());
         $data = [
             'user' => $user,
             'role' => $role
@@ -122,30 +130,29 @@ class UserController extends BaseController
      */
     public function update(Request $request, $id)
     {
+        $user = User::where('id', $id)->first();
         $validate = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $id, 
+            'email' => ['required', 'email', Rule::unique('users')->ignore($id), new LowerCase], 
             'password' => 'required|min:8',
-            'role' => 'required'    
+            'role' => 'required', 
+            'position' => 'required'
         ]);
         if($validate->fails())
         {
-            return $this->errorResponse('Validate Error', $validate->errors());
+            return $this->errorResponse($validate->errors(), 400);
         }
-       
-        $user = User::findOrFail($id);
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password
+            'password' => $request->password,
+            'position_id' => $request->position
         ]);
         if($request->has('role')){
             $user->syncRoles($request->role);
         }
         return $this->sendResponse($user, 'data has been updated');
-
-
-    }
+    }    
 
     /**
      * Remove the specified resource from storage.
@@ -160,22 +167,8 @@ class UserController extends BaseController
         return $this->sendResponse($user, 'This user has been delete');
     }
     
-    public function profile($id)
-    {
-        $user = UserResource::collection(User::where('id', $id)->get());
-        return $this->sendResponse($user, 'ldkjlj');
-    }
+   
    
 }
 
 
-
-        // $user = $request->user();
-        // if($user->hasRole('leader'))
-        // {
-        //    $user = UserResource::collection(User::role(['co-leader', 'user'])->with(['roles', 'position ' ])->get());
-        //    return $this->sendResponse($user, 'Here ur data');
-        // }
-
-        // $user = UserResource::collection(User::role('user')->with('roles')->get());
-        //    return $this->sendResponse($user, 'Here ur data');

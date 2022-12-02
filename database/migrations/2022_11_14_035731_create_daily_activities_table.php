@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('daily_activities', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('user_id');
             $table->longText('activity');
             $table->date('date');

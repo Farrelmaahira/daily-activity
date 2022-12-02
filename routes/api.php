@@ -39,7 +39,7 @@ Route::middleware(['auth:sanctum', 'role:leader|co-leader|user'])->group(functio
     Route::get('/v1/dashboard', [ApiDashboardController::class, 'index']);
     Route::resource('/v1/dashboard/myactivity', MyActivityController::class);
     Route::post('/v1/auth/logout', [AuthController::class, 'logout']);
-    Route::get('/v1/dashboard/overtime', [OvertimeController::class, 'general']);
+    Route::get('/v1/dashboard/overtime', [OvertimeController::class, 'index']);
     Route::resource('/v1/dashboard/profile', ProfileController::class);
     Route::resource('/v1/dashboard/myovertime', MyOvertimeController::class);
 });
@@ -53,49 +53,30 @@ Route::middleware(['auth:sanctum', 'role:leader'])->group(function () {
     Route::get('/v1/dashboard/user/profile/{id}', [UserController::class, 'show']);
 });
 
+/*
+http://192.168.101.144/dashboard
+
+ACTIVITY
+http://192.168.101.144/dashboard/activity (activity general)
+http://192.168.101.144/dashboard/myactivity (myactivity)
+http://192.168.101.144/dashboard/myactivity/id (get & post myactivity by id)
+http://192.168.101.144/dashboard/myactivity/id (update & delete myactivity by id)
+OVERTIME
+http://192.168.101.144/dashboard/overtime (overtime general)
+http://192.168.101.144/dashboard/myovertime ( get & post myovertime )
+http://192.168.101.144/dashboard/myovertime/id ( get overtime by id)
+http://192.168.101.144/dashboard/myovertime/id (update & delete overtime by id )
+USER (ROLE LEADER & CO LEADER)
+http://192.168.101.144/dashboard/user (get & post all user)
+http://192.168.101.144/dashboard/user/create (get data role & position)
+http://192.168.101.144/dashboard/user/id (get user by id)
+http://192.168.101.144/dashboard/user/id (update & delete user by id)
+PROFILE
+http://192.168.101.144/dashboard/profile (get profile)
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Route::controller()
-
-// Route::middleware(['auth:sanctum', 'role:user'])->group(function (){
-//     Route::get('/v1/dashboard', [UserDashboardController::class, 'index']);
-// });
-
-// Route::middleware(['auth:sanctum', 'role:leader'])->group(function (){
-//     Route::get('/v1/dashboard', [LeaderDashboardController::class, 'index']);
-// });
-
-
-
-
-// Route::middleware(['auth:sanctum', 'role:leader'])->group(function (){
-//     Route::resource('/v1/dashboard/activity/leader', LeaderActivityController::class);
-// });
-
-// Route::middleware(['auth:sanctum', 'role:co-leader'])->group(function (){
-//     Route::resource('/v1/dashboard/activity/co-leader', ColeaderActivityController::class);
-// });
-
-
-
+*/

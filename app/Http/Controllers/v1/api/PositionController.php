@@ -8,6 +8,7 @@ use App\Http\Controllers\v1\api\BaseController;
 use App\Http\Resources\PositionResource;
 use App\Models\Position;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class PositionController extends BaseController
 {
@@ -47,7 +48,7 @@ class PositionController extends BaseController
 
         if($validate->fails())
         {
-            return $this->errorResponse('Validation error', $validate->errors(), 400);
+            return $this->errorResponse($validate->errors(), 400);
         }
 
       $data = Position::create([
@@ -64,7 +65,8 @@ class PositionController extends BaseController
      */
     public function show($id)
     {
-        //
+        $position = PositionResource::collection(Position::where('id', $id)->get());
+        return $this->sendResponse($position, 'Success');
     }
 
     /**
@@ -75,8 +77,7 @@ class PositionController extends BaseController
      */
     public function edit($id)
     {
-        $position = PositionResource::collection(Position::where('id', $id)->get());
-        return $this->sendResponse($position, 'Success');
+      
     }
 
     /**
@@ -89,7 +90,7 @@ class PositionController extends BaseController
     public function update(Request $request, $id)
     {
         $validate = Validator::make($request->all(), [
-            'name' => 'required|unique:positions'
+            'name' => [ 'required', Rule::unique('positions')->ignore($id)]
         ]);
         if($validate->fails())
         {

@@ -19,9 +19,16 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'position' => $this->position,
-            'created_at' => $this->created_at->format('d/m/Y'),
-            'updated_at' => $this->updated_at->format('d/m/Y'),
             'role' => $this->roles->pluck('name')
         ];
     }
 }
+
+
+/*
+http://192.168.101.144/dashboard
+
+
+
+
+*/

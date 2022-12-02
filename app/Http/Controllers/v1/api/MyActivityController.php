@@ -5,10 +5,10 @@ namespace App\Http\Controllers\v1\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ActivityResource;
 use App\Models\DailyActivity;
+use App\Rules\CantSame;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
-
+use Illuminate\Validation\ValidationException;
 
 class MyActivityController extends BaseController
 {
@@ -19,20 +19,9 @@ class MyActivityController extends BaseController
      */
     public function index(Request $request)
     {
-        $user = $request->user();
-        $act = ActivityResource::collection(DailyActivity::where('user_id', $user['id'])->get());
-        return $this->sendResponse($act, 'lasdjf');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
-    {
-        $user = $request->user();
-        return response()->json($user);
+         $user = $request->user();
+         $act = ActivityResource::collection(DailyActivity::where('user_id', $user['id'])->get());
+         return $this->sendResponse($act, 'lasdjf');
     }
 
     /**
@@ -42,25 +31,18 @@ class MyActivityController extends BaseController
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-       
+    { 
         $user = $request->user();
-        $validate = Validator::make($request->all(), [
-            'activity' => 'required',
+        $request->validate([
+            'activity' => ['required'],
             'date' => 'required'
         ]);
 
-        if($validate->fails())
-        {
-            return $this->errorResponse('Validate Error', $validate->errors(), 400);
-        }
-        // CHECK DATA IF DATA EXIST
-        $data = DailyActivity::where('user_id', $user['id'])->where('date', $request->date)->get();
-        $count = count($data);
-        if($count > 0)
-        {
-            return $this->errorResponse($request, 'You have been input your activity on this date', 400);
-        }
+        // // CHECK DATA IF DATA EXIST
+        $data = DailyActivity::where('user_id', $user['id'])->where('date', $request->date)->count();
+
+        if($data > 0)  throw ValidationException::withMessages(['date' => 'you have been input data on this date']);
+        
         // STORE DATA
         $data = DailyActivity::create([
             'user_id' => $user['id'],
@@ -69,50 +51,23 @@ class MyActivityController extends BaseController
         ]);
 
         return $this->sendResponse(new ActivityResource($data), 'Success');
-
-        
-        
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id, Request $request)
-    {
-       
-        $user = $request->user();
-        $data = DailyActivity::where('user_id', $user['id'])->where('id', $id)->get();
-        $count = count($data);
-        $response = ActivityResource::collection($data);
-       
-        if($count === 0  )
-        {
-            return $this->errorResponse('Data not Found');
-        }
-        return $this->sendResponse($response, 'pp');
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
+     *  
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id, Request $request)
     {
         $user = $request->user();
-        $data = DailyActivity::where('user_id', $user['id'])->where('id', $id)->get();
-        $count = count($data);
-        $response = ActivityResource::collection($data);
-       
-        if($count === 0  )
+        $data = DailyActivity::findOrFail($id);
+        if($data->user_id !== $user['id'])
         {
-            return $this->errorResponse('Data not Found');
+            return $this->errorResponse('Forbidden', 403);
         }
-        return $this->sendResponse($response, 'pp');
+        return $this->sendResponse($data, 'pp');
     }
 
     /**
@@ -124,21 +79,18 @@ class MyActivityController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        $user = $request->user();
         $validate = Validator::make($request->all(), [
             'activity' => 'required',
-            'date' => 'required'
+            // 'date' => 'required'
         ]);
         if($validate->fails())
         {
-            return $this->errorResponse('Validate Error', $validate->errors(), 400);
+            return $this->errorResponse($validate->errors(), 400);
         }
-
-        $act = DailyActivity::where('user_id', $user['id'])->where('id', $id);
+        $act = DailyActivity::findOrFail($id); 
         $act->update([
-            'user_id' => $user['id'],
             'activity' => $request->activity,
-            'date' => $request->date
+            // 'date' => $request->date
         ]);
         return $this->sendResponse($act, 'Data has been update');
     }
@@ -159,29 +111,8 @@ class MyActivityController extends BaseController
             return $this->errorResponse('Data Not Found');
         }
         $data = DailyActivity::where('user_id', $user['id'])->where('id', $id)->delete();
-        return $this->sendResponse($data, 'Data has been deleted', 204);
+        return $this->sendResponse('', 'Data has been deleted', 200);
     }
 
-    public function general()
-    {
-        $data = ActivityResource::collection(DailyActivity::select()->get());
-        return $this->sendResponse($data, 'success');
-    }
+   
 }
-// $user = $request->user();
-// $validate = Validator::make($request->all(), [
-//     'activity' => 'required',
-//     'date' => 'required'
-// ]);
-// if($validate->fails())
-// {
-//     return $this->errorResponse('Validation Failed', $validate->errors(), 400);
-// }
-// $act = DailyActivity::create([
-//     'user_id' => $user['id'],
-//     'activity' => $request->activity,
-//     'date' => $request->date
-// ]);
-
-
-// return $this->sendResponse(new ActivityResource($act), 'Add Activities success');

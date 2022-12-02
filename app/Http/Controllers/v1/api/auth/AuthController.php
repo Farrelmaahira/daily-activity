@@ -24,17 +24,17 @@ class AuthController extends BaseController
 
     public function register(Request $request)
     {
-    
         $validate = Validator::make($request->all(), [
             'name' => ['required'],
-            'email' => ['required','email','unique:users', new LowerCase],
-            'password' => ['required','min:8'],
+            'email' => ['required', 'email', 'unique:users', new LowerCase],
+            'password' => ['required', 'min:8'],
             'position' => ['required']
         ]);
-
-        if ($validate->fails()) {
-            return $this->errorResponse('Validation fails', $validate->errors(), 400);
+        if ($validate->fails()) 
+        {
+            return $this->errorResponse( $validate->errors(), 400);
         }
+         
        
         $user = User::create([
             'name' => $request->name,
@@ -47,7 +47,6 @@ class AuthController extends BaseController
         $token = $user->createToken('APITOKEN')->plainTextToken;
         $data['data'] = $user;
         $data['token'] = $token;
-
         return $this->sendResponse($data, 'User has been registered' );
     }
 
@@ -77,12 +76,12 @@ class AuthController extends BaseController
             }
         }
 
-        return $this->errorResponse('', 'The credentials is not match with our record', 400);
+        return $this->errorResponse('The credentials is not match with our record', 400);
     }
 
    public function logout(Request $request)
    {
-        $user = $request->user()->tokens()->delete();
-        return $this->sendResponse($user, 'Logout Succesfully');
+        $request->user()->currentAccessToken()->delete();
+        return $this->sendResponse('', 'Logout Succesfully');
    }
 }

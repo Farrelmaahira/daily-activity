@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Rules\LowerCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends BaseController
 {
@@ -27,38 +28,6 @@ class ProfileController extends BaseController
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -67,7 +36,7 @@ class ProfileController extends BaseController
     public function edit($id, Request $request)
     {
         $user = $request->user();   
-        $data = User::where('id', $id)->get();
+        $data = User::where('id', $user['id'])->get();
         return $data;
 
     }
@@ -82,23 +51,24 @@ class ProfileController extends BaseController
      */
     public function update(Request $request, $id)
     {
+        $user = User::where('id', $id);
         $validate = Validator::make($request->all(), [
             'name' => ['required'],
-            'email' => ['required', 'unique:users,email,' . $id , new LowerCase],
-            'position_id' => ['required']
+            'email' => ['required', Rule::unique('users')->ignore($id), new LowerCase],
+            'position' => ['required']
         ]); 
         if($validate->fails())
         {
-            return $this->errorResponse('Validation error', $validate->errors(), 400);
+            return $this->errorResponse($validate->errors(), 400);
         }
         
-        $data = User::where('id', $id)->update([
+        $user->update([
             'name' => $request->name,
             'email' => $request->email,
-            'position_id' => $request->position_id
+            'position_id' => $request->position
         ]);
 
-        return $this->sendResponse($data, 'data has been updated');
+        return $this->sendResponse($user, 'data has been updated');
 
     }
 
@@ -108,11 +78,13 @@ class ProfileController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy( Request $request)
     {
-       $data = User::where('id', $id);
-       $data->delete();
-
-       return $this->sendResponse($data, 'data has been deleted');
+        $user = $request->user();
+        $token = $user->currentAccessToken();
+        $token->delete();
+        $data = User::where('id', $user['id']);
+        $data->delete();
+        return $this->sendResponse($data, 'data has been deleted');
     }
 }
