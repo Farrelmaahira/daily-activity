@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('position_id');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('image')->default('default.jpg')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

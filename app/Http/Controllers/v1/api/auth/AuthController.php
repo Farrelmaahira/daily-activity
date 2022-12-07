@@ -35,7 +35,7 @@ class AuthController extends BaseController
             return $this->errorResponse( $validate->errors(), 400);
         }
          
-       
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,

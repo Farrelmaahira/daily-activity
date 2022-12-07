@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProfileResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Rules\LowerCase;
@@ -22,8 +23,8 @@ class ProfileController extends BaseController
     {
         
        $user = $request->user();
-       $data = UserResource::make($user);
-       return response()->json($data);
+       $data = ProfileResource::make($user);
+       return $this->sendResponse('Profile data', $data);
         
     }
 
@@ -56,17 +57,23 @@ class ProfileController extends BaseController
             'name' => ['required'],
             'email' => ['required', Rule::unique('users')->ignore($id), new LowerCase],
             'position' => ['required']
+            
         ]); 
         if($validate->fails())
         {
             return $this->errorResponse($validate->errors(), 400);
         }
-        
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'position_id' => $request->position
-        ]);
+        if($request->has('image'))
+        {
+            $image = $request->file('image');
+            $image->storeAs('storage/img/', $image->hashName());
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'position_id' => $request->position,
+                'image' => $request->image 
+            ]);
+        }
 
         return $this->sendResponse($user, 'data has been updated');
 
@@ -86,5 +93,6 @@ class ProfileController extends BaseController
         $data = User::where('id', $user['id']);
         $data->delete();
         return $this->sendResponse($data, 'data has been deleted');
+        
     }
 }

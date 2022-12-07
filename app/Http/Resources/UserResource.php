@@ -23,12 +23,3 @@ class UserResource extends JsonResource
         ];
     }
 }
-
-
-/*
-http://192.168.101.144/dashboard
-
-
-
-
-*/

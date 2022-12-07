@@ -16,6 +16,9 @@ class DailyActivity extends Model
         'date'
     ];
 
+    protected $dates = [
+        'date'
+    ];
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id');

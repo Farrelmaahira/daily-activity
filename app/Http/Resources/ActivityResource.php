@@ -16,9 +16,10 @@ class ActivityResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user' => $this->user,
+            'user' => $this->user->name,
+            'position' =>  $this->user->position_id,
+            'date' => $this->date->isoFormat('DD MMMM Y'),
             'activity' => $this->activity,
-            'date' => $this->date,
         ];
     }
 }

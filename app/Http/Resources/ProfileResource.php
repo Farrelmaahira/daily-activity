@@ -3,8 +3,9 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
-class OvertimeResource extends JsonResource
+class ProfileResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +17,10 @@ class OvertimeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'overtime' => $this->overtime,
-            'date' => $this->date->isoFormat('DD MMMM Y'),
-            'from' => $this->from,
-            'untill' => $this->untill,
-            'user' => $this->user->name,
-            'position' => $this->user->position_id
+            'name' => $this->name,
+            'email' => $this->email,
+            'position' => $this->position,
+            'image' => asset('storage/img/'.$this->image)
         ];
     }
 }
