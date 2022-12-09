@@ -33,7 +33,11 @@ class ActivityController extends BaseController
         
         if($request->has('search'))
         {
-            $dailyAct->where('activity','%'. $request->search . '%' );
+            $dailyAct->where(function($query) use ($request){
+                $query->where('activity', 'LIKE', '%' . $request->search . '%')->orWhereHas('user', function($q) use ($request) {
+                    $q->where('user', 'LIKE', '%'. $request->search. '%');
+                });
+            });
         }
 
         if($request->has('date'))
