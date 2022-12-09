@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $leader = User::create([
+        $leader = User::create([  
             'name' => 'Caqa',
             'email' => 'caqa@gmail.com',
             'password' => Hash::make('falah0918'),
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             'name' => 'Aldi',
             'email' => 'aldi@gmail.com',
             'password' => Hash::make('falah0918'),
-            'position_id' => 1
+            'position_id' => 2
         ]);
         $coLeader->assignRole('co-leader');
 
@@ -37,14 +37,14 @@ class UserSeeder extends Seeder
             'name' => 'Faiz',
             'email' => 'faiz@gmail.com',
             'password' => Hash::make('falah0918'),
-            'position_id' => 1
+            'position_id' => 3
         ]);
         $coLeader2->assignRole('co-leader');
 
         $user = User::create([
             'name' => 'Farrel',
             'email' => 'farrel@gmail.com',
-            'password' => Hash::make('falah0918'),
+            'password' => Hash::make('falah0918'), 
             'position_id' => 1
         ]);
         $user->assignRole('user');
@@ -53,8 +53,10 @@ class UserSeeder extends Seeder
             'name' => 'idham',
             'email' => 'idham@gmail.com',
             'password' => Hash::make('falah0918'),
-            'position_id' => 1
+            'position_id' => 2
         ]);
         $idham->assignRole('user');
+
+        
     }
 }

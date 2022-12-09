@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends BaseController
 {
@@ -56,11 +57,7 @@ class AuthController extends BaseController
             'email' => ['required',  new LowerCase],
             'password' => ['required']
         ]);
-        // if($validate->fails())
-        // {
-        //     return $this->errorResponse('validation error', $validate->errors(), 400 );
-        // }
-
+     
         $user = User::where('email', $request->email)->first();
         $response = UserResource::make($user);
         if(Auth::attempt($validate))
@@ -76,7 +73,7 @@ class AuthController extends BaseController
             }
         }
 
-        return $this->errorResponse('The credentials is not match with our record', 400);
+        throw ValidationException::withMessages(['email' => 'This credentials not match with our record']);
     }
 
    public function logout(Request $request)

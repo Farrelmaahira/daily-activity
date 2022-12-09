@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\DailyActivity;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ActivityResource extends JsonResource
@@ -14,12 +15,15 @@ class ActivityResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'id' => $this->id,
-            'user' => $this->user->name,
-            'position' =>  $this->user->position_id,
-            'date' => $this->date->isoFormat('DD MMMM Y'),
-            'activity' => $this->activity,
-        ];
+
+            return [
+                'no' => $this->no,
+                'id' => $this->id,
+                'user' => $this->user->name,
+                'position' =>  $this->user->position_id,
+                'date' => $this->date->isoFormat('DD MMMM Y'),
+                'activity' => $this->activity,
+            ];
     }
 }
+//

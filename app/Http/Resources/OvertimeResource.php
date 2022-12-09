@@ -15,6 +15,7 @@ class OvertimeResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'no' => $this->no,
             'id' => $this->id,
             'overtime' => $this->overtime,
             'date' => $this->date->isoFormat('DD MMMM Y'),

@@ -6,11 +6,8 @@ use App\Http\Controllers\v1\api\BaseController;
 use App\Http\Resources\ActivityResource;
 use App\Models\DailyActivity;
 use App\Models\Position;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Validator;
 
 
 class ActivityController extends BaseController
@@ -26,13 +23,19 @@ class ActivityController extends BaseController
             'date' => 'nullable',
             'month' => 'nullable',
             'position' => 'nullable',
-            'sort' => 'nullable'
+            'sort' => 'nullable',
+            'search' => 'nullable'
         ]);
 
         $dailyAct = DailyActivity::query();
 
         $date = Carbon::parse($request->date);
         
+        if($request->has('search'))
+        {
+            $dailyAct->where('activity','%'. $request->search . '%' );
+        }
+
         if($request->has('date'))
         {
             $dailyAct->where('date', $date);
@@ -58,7 +61,12 @@ class ActivityController extends BaseController
                 $dailyAct->oldest();
             }
         }
-        $data = ActivityResource::collection($dailyAct->get());
+        
+        $activity = ActivityResource::collection($dailyAct->get());
+        $data = $activity->map(function($d, $key){
+            $d['no'] = $key+1;  
+            return $d;
+        });
         return $this->sendResponse($data, 'blabla');
     }
 

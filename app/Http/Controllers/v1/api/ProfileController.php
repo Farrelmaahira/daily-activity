@@ -73,7 +73,7 @@ class ProfileController extends BaseController
                 'position_id' => $request->position,
                 'image' => $request->image 
             ]);
-        }
+        }   
 
         return $this->sendResponse($user, 'data has been updated');
 

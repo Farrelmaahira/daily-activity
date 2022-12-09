@@ -13,15 +13,12 @@ use Illuminate\Support\Facades\Validator;
 class OvertimeController extends BaseController
 {
     /**
-     * Display a listing of the resource.
-     *
+     * Display a listing of the resource.     *
      * @return \Illuminate\Http\Response
      */
-
-   
     public function index(Request $request)
     {
-        $this->validate($request, [
+         $this->validate($request, [
             'date' => 'nullable',
             'month' => 'nullable',
             'position' => 'nullable',
@@ -53,7 +50,12 @@ class OvertimeController extends BaseController
                 $ovt->latest();
            }
         }
-        $data = OvertimeResource::collection($ovt->latest()->paginate(10));
-        return $data;
+
+        $overtime = OvertimeResource::collection($ovt->get());
+        $data = $overtime->map(function ($d, $key){
+            $d['no'] = $key+1;
+            return $d;
+        });
+        return $this->sendResponse($data, 'pp');
     }
 }
