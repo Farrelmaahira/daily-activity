@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+
 
 class DailyActivity extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, Searchable;
 
     protected $fillable = [
         'user_id',
@@ -22,7 +24,18 @@ class DailyActivity extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class);
     }
 
+    public function toSearchableArray()
+    {
+        return [
+            'activity' => $this->activity,
+        ];
+    }
+
+    protected function makeAllSearchableUsing($query)
+    {
+        return $query->with('users');
+    }
 }

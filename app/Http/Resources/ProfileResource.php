@@ -20,7 +20,8 @@ class ProfileResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'position' => $this->position,
-            'image' => asset('storage/img/'.$this->image)
+            'image' => asset('/storage/img/'.$this->image),
+            'notifications' => $this->unReadNotifications
         ];
     }
 }

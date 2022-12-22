@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1\api;
 use App\Http\Controllers\v1\api\BaseController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DashboardResource;
+use App\Http\Resources\ProfileResource;
 use App\Models\DailyActivity;
 use App\Models\Position;
 use App\Models\User;
@@ -19,11 +20,7 @@ class DashboardController extends BaseController
      */
     public function index(Request $request)
     {   
-        $user = $request->user();
-        if($user->hasRole('leader'))
-        {
-           $user->unreadNotifications;
-        }
+        $user = ProfileResource::make($request->user());
         $data = Position::orderBy('id')->withCount("user");
         $result['position_label'] = $data->pluck('name');
         $result['user_position'] = $data->pluck('user_count');

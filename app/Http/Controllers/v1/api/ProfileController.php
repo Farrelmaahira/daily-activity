@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Rules\LowerCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -66,12 +67,14 @@ class ProfileController extends BaseController
         if($request->has('image'))
         {
             $image = $request->file('image');
-            $image->storeAs('storage/img/', $image->hashName());
+            $image->getClientOriginalName();
+            Log::info($image);
+            $image->storeAs('img/', $image->hashName());
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'position_id' => $request->position,
-                'image' => $request->image 
+                'image' => $request->image->hashName()
             ]);
         }   
 

@@ -27,23 +27,20 @@ class ActivityController extends BaseController
             'search' => 'nullable'
         ]);
 
-        $dailyAct = DailyActivity::query();
+        $dailyAct = new DailyActivity();
 
         $date = Carbon::parse($request->date);
-        
+        // SEARCH DATA
         if($request->has('search'))
         {
-            $dailyAct->where(function($query) use ($request){
-                $query->where('activity', 'LIKE', '%' . $request->search . '%')->orWhereHas('user', function($q) use ($request) {
-                    $q->where('user', 'LIKE', '%'. $request->search. '%');
-                });
-            });
+            $dailyAct = DailyActivity::search($request->search);
         }
-
+        // FILTER BY DATE
         if($request->has('date'))
         {
             $dailyAct->where('date', $date);
         }
+        // FILTER BY POSITION
         if($request->has('position'))
         {
             $dailyAct->whereHas('user', function($query) use ($request)
@@ -51,10 +48,12 @@ class ActivityController extends BaseController
                 $query->where('position_id', $request->position);
             });
         }
+        //FILTER BY MONTH
         if($request->has('month'))
         {
             $dailyAct->whereMonth('date', $request->month);
         }
+        //SORT BY DATE
         if($request->has('sort'))
         {
             if($request->sort == 'latest')
